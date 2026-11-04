@@ -1,0 +1,30 @@
+# c3 App — Single-Page-Anwendung
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Die gebuendelten Dateien tragen einen Hash im Namen und duerfen lange liegen.
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css               "access plus 1 year"
+  ExpiresByType font/ttf               "access plus 1 year"
+  ExpiresByType image/png              "access plus 1 month"
+  # index.html nie zwischenspeichern, sonst bekommt niemand ein Update.
+  <FilesMatch "index\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
